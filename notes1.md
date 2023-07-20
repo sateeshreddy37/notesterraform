@@ -91,3 +91,43 @@ location = "eastus"
 vnet-range = [ "10.100.0.0/16" ]
 ---
 
+
+## CREATED SQLSERVER DATABASE
+---
+provider "azurerm" {
+  features {}
+}
+resource "azurerm_resource_group" "sateesh" {
+  name     = "sateesh-resources"
+  location = "West Europe"
+}
+
+resource "azurerm_storage_account" "vitr" {
+  name                     = "vitr"
+  resource_group_name      = azurerm_resource_group.sateesh.name
+  location                 = azurerm_resource_group.sateesh.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_mssql_server" "sateesh" {
+  name                         = "sateesh-sqlserver"
+  resource_group_name          = azurerm_resource_group.sateesh.name
+  location                     = azurerm_resource_group.sateesh.location
+  version                      = "12.0"
+  administrator_login          = "4dm1n157r470r"
+  administrator_login_password = "4-v3ry-53cr37-p455w0rd"
+}
+
+resource "azurerm_mssql_database" "test1" {
+  name           = "acctest-db-d"
+  server_id      = azurerm_mssql_server.sateesh.id
+  sku_name       = "Basic"
+
+  tags = {
+    foo = "bar"
+  }
+}
+
+---
+![preview](./images/database1.md.png)
